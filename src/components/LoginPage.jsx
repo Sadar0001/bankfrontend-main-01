@@ -34,11 +34,14 @@ export default function LoginPage() {
                 // 3. Save to Zustand (Store handles localStorage automatically)
                 login(userData, token);
 
-                // 4. Redirect
-                if (userData.role === "MANAGER") {
+                // FIX: Check for "BRANCHMANAGER" instead of "MANAGER"
+                if (userData.role === "BRANCHMANAGER") {
                     navigate("/manager");
+                } else if (userData.role === "CUSTOMER") {
+                    navigate("/customer"); // or "/"
                 } else {
-                    navigate("/"); // or /customer
+                    // Fallback
+                    navigate("/");
                 }
 
             } else {

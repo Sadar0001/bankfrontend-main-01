@@ -4,8 +4,12 @@ import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignupPage";
 import RequireAuth from "./components/RequireAuth";
 import UserSection from "./components/UserSection.jsx";
-import CustomerDashboard from "./components/customer/CustomerDashboard";
 
+// Dashboards
+import CustomerDashboard from "./components/customer/CustomerDashboard";
+import ManagerDashboard from "./components/manager/ManagerDashboard";
+import TellerDashboard from "./components/teller/TellerDashboard";
+import HeadBankDashboard from "./components/headbank/HeadBankDashboard";
 
 function App() {
     return (
@@ -22,17 +26,29 @@ function App() {
 
                         {/* PROTECTED ROUTES */}
 
-                        {/* ✅ FIX: CustomerDashboard is NOW inside the RequireAuth wrapper */}
-                        {/* Customer Routes */}
+                        {/* 1. Customer Routes */}
                         <Route element={<RequireAuth allowedRoles={["CUSTOMER"]} />}>
-                            {/* 👇 Now the Real Dashboard is Protected */}
                             <Route path="/customer/*" element={<CustomerDashboard />} />
                         </Route>
 
-                        {/* Manager Routes */}
-                        <Route element={<RequireAuth allowedRoles={["MANAGER"]} />}>
-                            <Route path="/manager/*" element={<h1>Manager Dashboard</h1>} />
+                        {/* 2. Manager Routes */}
+                        <Route element={<RequireAuth allowedRoles={["BRANCHMANAGER"]} />}>
+                            <Route path="/manager/*" element={<ManagerDashboard />} />
                         </Route>
+
+                        {/* 3. Teller Routes */}
+                        <Route element={<RequireAuth allowedRoles={["TELLER"]} />}>
+                            <Route path="/teller/*" element={<TellerDashboard />} />
+                        </Route>
+
+                        {/* 4. Head Bank Admin Routes */}
+                        <Route element={<RequireAuth allowedRoles={["HEADMANAGER"]} />}>
+                            <Route path="/headbank/*" element={<HeadBankDashboard />} />
+                        </Route>
+
+                        {/* Errors */}
+                        <Route path="/unauthorized" element={<h1>Access Denied</h1>}/>
+                        <Route path="*" element={<h1>404 - Page Not Found</h1>}/>
 
                     </Routes>
                 </div>
@@ -42,4 +58,3 @@ function App() {
 }
 
 export default App;
-
