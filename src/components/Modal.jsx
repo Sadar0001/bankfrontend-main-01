@@ -1,46 +1,32 @@
-import { useEffect } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription
+} from "@/components/ui/dialog";
 
-export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
-    // Close on ESC key
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === 'Escape') onClose();
-        };
-        if (isOpen) window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
-    }, [isOpen, onClose]);
-
-    if (!isOpen) return null;
-
-    const sizeClasses = {
-        sm: 'max-w-md',
-        md: 'max-w-2xl',
-        lg: 'max-w-4xl',
-        xl: 'max-w-6xl'
-    };
-
+export default function Modal({ isOpen, onClose, title, children, description }) {
+    // Map existing props to Shadcn Dialog API
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-            <div
-                className={`bg-gray-900 rounded-xl shadow-2xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden border border-gray-700 animate-slideUp`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-700">
-                    <h2 className="text-2xl font-bold text-white">{title}</h2>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-white text-2xl leading-none transition"
-                    >
-                        ×
-                    </button>
-                </div>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="bg-white dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-50 sm:max-w-lg shadow-none">
+                <DialogHeader>
+                    <DialogTitle className="text-xl font-bold text-emerald-900 dark:text-emerald-100">
+                        {title}
+                    </DialogTitle>
+                    {description && (
+                        <DialogDescription className="text-emerald-600 dark:text-emerald-400">
+                            {description}
+                        </DialogDescription>
+                    )}
+                </DialogHeader>
 
-                {/* Content */}
-                <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                {/* Content Container */}
+                <div className="py-4">
                     {children}
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 }

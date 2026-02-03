@@ -3,6 +3,10 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { getAllLoanOffers, addLoanOffer, deactivateLoanOffer } from "../../../services/head-bank-api-service";
 import Modal from "../../Modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, Banknote } from "lucide-react";
 
 export default function ManageLoanOffersPage() {
     const navigate = useNavigate();
@@ -37,56 +41,83 @@ export default function ManageLoanOffersPage() {
     }
 
     return (
-        <div className="p-8 text-white min-h-screen">
-            <button onClick={() => navigate('/headbank')} className="text-blue-400 mb-6">← Back</button>
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold">Loan Offers</h2>
-                <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 px-6 py-2 rounded font-bold">+ Create Offer</button>
+        <div className="w-full bg-emerald-200 dark:bg-emerald-800 rounded-3xl border border-emerald-300 dark:border-emerald-700 shadow-none p-6 md:p-10 min-h-[85vh]">
+
+            <div className="flex justify-between items-center mb-8">
+                <Button variant="ghost" onClick={() => navigate('/headbank')} className="text-emerald-800 dark:text-emerald-200 hover:bg-emerald-300 dark:hover:bg-emerald-700">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                </Button>
+                <h2 className="text-3xl font-extrabold text-emerald-950 dark:text-emerald-50">Loan Offers</h2>
+                <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+                    + Create Offer
+                </Button>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
                 {offers.map(offer => (
-                    <div key={offer.id} className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <h3 className="font-bold text-xl text-yellow-400">{offer.offerName}</h3>
-                        <p className="text-sm text-gray-400">{offer.loanType}</p>
-                        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-                            <div>Interest: <span className="font-bold text-white">{offer.interestRate}%</span></div>
-                            <div>Tenure: {offer.minTenureMonths}-{offer.maxTenureMonths} m</div>
-                            <div>Min: ₹{offer.minAmount}</div>
-                            <div>Max: ₹{offer.maxAmount}</div>
-                        </div>
-                        {offer.isActive && (
-                            <button onClick={() => onDelete(offer.id)} className="mt-4 w-full bg-red-600/20 text-red-400 py-2 rounded">
-                                Deactivate Offer
-                            </button>
-                        )}
-                    </div>
+                    <Card key={offer.id} className="bg-white dark:bg-emerald-900 border-emerald-100 dark:border-emerald-700 shadow-sm relative overflow-hidden">
+                        {/* Decorative side bar */}
+                        <div className="absolute left-0 top-0 bottom-0 w-2 bg-emerald-500" />
+
+                        <CardContent className="p-6 pl-8">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="font-bold text-xl text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
+                                        <Banknote className="h-5 w-5 text-emerald-500" />
+                                        {offer.offerName}
+                                    </h3>
+                                    <p className="text-sm text-emerald-600 dark:text-emerald-400 font-bold mt-1 uppercase tracking-wide">{offer.loanType}</p>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-300">{offer.interestRate}%</span>
+                                    <p className="text-[10px] text-emerald-500">INTEREST</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 grid grid-cols-2 gap-4 text-sm text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 p-4 rounded-lg">
+                                <div>
+                                    <p className="text-xs text-emerald-500">Tenure</p>
+                                    <p className="font-bold">{offer.minTenureMonths} - {offer.maxTenureMonths} Mo</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-emerald-500">Range</p>
+                                    <p className="font-bold">₹{offer.minAmount} - ₹{offer.maxAmount}</p>
+                                </div>
+                            </div>
+
+                            {offer.isActive && (
+                                <Button onClick={() => onDelete(offer.id)} variant="ghost" className="mt-4 w-full text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30">
+                                    Deactivate Offer
+                                </Button>
+                            )}
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create Loan Offer">
-                <form onSubmit={handleSubmit(onAdd)} className="space-y-3 text-gray-800 text-sm">
-                    <input {...register("name")} placeholder="Offer Name" className="w-full p-2 rounded" required />
-                    <select {...register("loanType")} className="w-full p-2 rounded">
+                <form onSubmit={handleSubmit(onAdd)} className="space-y-4">
+                    <Input {...register("name")} placeholder="Offer Name" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
+                    <select {...register("loanType")} className="w-full p-2 rounded bg-emerald-50 dark:bg-emerald-900 border border-emerald-200 dark:border-emerald-700 text-sm">
                         <option value="PERSONAL">PERSONAL</option>
                         <option value="HOME">HOME</option>
                         <option value="CAR">CAR</option>
                         <option value="EDUCATION">EDUCATION</option>
                     </select>
-                    <div className="grid grid-cols-2 gap-2">
-                        <input type="number" step="0.01" {...register("interestRate")} placeholder="Interest %" className="p-2 rounded" required />
-                        <input type="number" {...register("processingFee")} placeholder="Fee" className="p-2 rounded" />
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input type="number" step="0.01" {...register("interestRate")} placeholder="Interest %" className="bg-emerald-50 dark:bg-emerald-900" required />
+                        <Input type="number" {...register("processingFee")} placeholder="Fee" className="bg-emerald-50 dark:bg-emerald-900" />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <input type="number" {...register("minAmount")} placeholder="Min Amount" className="p-2 rounded" required />
-                        <input type="number" {...register("maxAmount")} placeholder="Max Amount" className="p-2 rounded" required />
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input type="number" {...register("minAmount")} placeholder="Min Amount" className="bg-emerald-50 dark:bg-emerald-900" required />
+                        <Input type="number" {...register("maxAmount")} placeholder="Max Amount" className="bg-emerald-50 dark:bg-emerald-900" required />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <input type="number" {...register("minTenure")} placeholder="Min Tenure (m)" className="p-2 rounded" required />
-                        <input type="number" {...register("maxTenure")} placeholder="Max Tenure (m)" className="p-2 rounded" required />
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input type="number" {...register("minTenure")} placeholder="Min Tenure (m)" className="bg-emerald-50 dark:bg-emerald-900" required />
+                        <Input type="number" {...register("maxTenure")} placeholder="Max Tenure (m)" className="bg-emerald-50 dark:bg-emerald-900" required />
                     </div>
-                    <input type="number" {...register("headBankId")} placeholder="Head Bank ID" className="w-full p-2 rounded" required />
-                    <button className="w-full bg-blue-600 text-white py-2 rounded font-bold mt-4">Save Offer</button>
+                    <Input type="number" {...register("headBankId")} placeholder="Head Bank ID" className="bg-emerald-50 dark:bg-emerald-900" required />
+                    <Button type="submit" className="w-full bg-emerald-600 text-white font-bold">Save Offer</Button>
                 </form>
             </Modal>
         </div>

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignupPage";
+import Footer from "./components/Footer";
 import RequireAuth from "./components/RequireAuth";
 import UserSection from "./components/UserSection.jsx";
 
@@ -14,16 +15,13 @@ import HeadBankDashboard from "./components/headbank/HeadBankDashboard";
 function App() {
     return (
         <BrowserRouter>
-            {/* LAYER 1: Main Page Background (Lightest Grey) - bg-slate-50 */}
-            <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans antialiased relative selection:bg-primary/20">
-
-                {/* Optional: Very faint texture */}
-                <div className="fixed inset-0 -z-10 h-full w-full bg-grid-pattern [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none opacity-40" />
+            {/* SOLID BACKGROUND: Emerald 50 (Light) / Emerald 950 (Dark) */}
+            <div className="min-h-screen w-full flex flex-col bg-emerald-50 dark:bg-emerald-950 text-emerald-950 dark:text-emerald-50 font-sans antialiased">
 
                 <Navbar />
 
-                {/* Main Content Container with padding */}
-                <div className="container mx-auto py-8 px-4 md:px-6">
+                {/* Main Content */}
+                <main className="flex-1 container mx-auto py-8 px-4 md:px-6">
                     <Routes>
                         <Route path="/" element={<UserSection/>}/>
                         <Route path="/login" element={<LoginPage/>}/>
@@ -45,10 +43,12 @@ function App() {
                             <Route path="/headbank/*" element={<HeadBankDashboard />} />
                         </Route>
 
-                        <Route path="/unauthorized" element={<h1>Access Denied</h1>}/>
-                        <Route path="*" element={<h1>404 - Page Not Found</h1>}/>
+                        <Route path="/unauthorized" element={<div className="p-10 font-bold text-red-600">Access Denied</div>}/>
+                        <Route path="*" element={<div className="p-10 font-bold">404 - Page Not Found</div>}/>
                     </Routes>
-                </div>
+                </main>
+
+                <Footer />
             </div>
         </BrowserRouter>
     );

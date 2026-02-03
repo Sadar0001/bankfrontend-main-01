@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import { getCustomerDashboardData } from "../../services/api.js";
-import { getCustomerRequestsData } from "../../services/customer-api-service.js"; // Import from new file
 import SectionRow from "./SectionRow";
 import UniversalCard from "./UniversalCard";
+import { Loader2 } from "lucide-react";
 
-// Import Sub-Pages
+// Sub-Pages
 import AccountDetailsPage from "./pages/AccountDetailsPage";
 import MakeTransactionPage from "./pages/MakeTransactionPage";
 import RequestAccountPage from "./pages/RequestAccountPage";
@@ -21,134 +21,69 @@ import LoanOffersPage from "./pages/LoanOffersPage";
 export default function CustomerDashboard() {
     const navigate = useNavigate();
     const user = useAuthStore((state) => state.user);
-
     const [data, setData] = useState({ accounts: [], cards: [], loans: [] });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
-        loadDashboardData();
+        getCustomerDashboardData().then(res => setData(res)).finally(() => setLoading(false));
     }, []);
 
-    const loadDashboardData = async () => {
-        try {
-            console.log("🔍 Loading dashboard data...");
-            setLoading(true);
-            const dashboardData = await getCustomerDashboardData();
-            console.log("✅ Dashboard data loaded:", dashboardData);
-            setData(dashboardData);
-            setError(null);
-        } catch (err) {
-            console.error("❌ Dashboard Error:", err);
-            setError("Failed to load dashboard data");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
-                    <p className="text-white mt-4">Loading Dashboard...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-red-400 text-xl mb-4">{error}</p>
-                    <button
-                        onClick={loadDashboardData}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
-                    >
-                        Retry
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    if (loading) return (
+        <div className="w-full h-[60vh] flex flex-col items-center justify-center text-emerald-600">
+            <Loader2 className="h-10 w-10 animate-spin mb-4" />
+            <p className="font-bold">Syncing Data...</p>
+        </div>
+    );
 
     return (
         <Routes>
-            {/* Main Dashboard */}
-            <Route path="/" element={<DashboardHome data={data} user={user} navigate={navigate} refresh={loadDashboardData} />} />
-
-            {/* Account Pages */}
-            <Route path="/account/:accountId" element={<AccountDetailsPage />} />
-            <Route path="/request-account" element={<RequestAccountPage onSuccess={loadDashboardData} />} />
-
-            {/* Transaction Pages */}
+            <Route path="/" element={<DashboardHome data={data} user={user} navigate={navigate} />} />
             <Route path="/transfer" element={<MakeTransactionPage accounts={data.accounts} />} />
-
-            {/* Card Pages */}
-            <Route path="/cards" element={<CardManagementPage cards={data.cards} refresh={loadDashboardData} />} />
-            <Route path="/cards/request" element={<RequestCardPage accounts={data.accounts} onSuccess={loadDashboardData} />} />
-
-            {/* Loan Pages */}
-            <Route path="/loans" element={<LoanOffersPage />} />
-            <Route path="/loans/apply" element={<RequestLoanPage onSuccess={loadDashboardData} />} />
-
-            {/* Request Pages */}
             <Route path="/requests" element={<ViewRequestsPage />} />
-            <Route path="/request-cheque" element={<RequestChequePage accounts={data.accounts} onSuccess={loadDashboardData} />} />
-
-            {/* Settings */}
             <Route path="/update-pin" element={<UpdatePinPage />} />
+            <Route path="/request-account" element={<RequestAccountPage />} />
+            <Route path="/account/:accountId" element={<AccountDetailsPage />} />
+            <Route path="/cards/request" element={<RequestCardPage accounts={data.accounts} />} />
+            <Route path="/cards" element={<CardManagementPage cards={data.cards} />} />
+            <Route path="/loans" element={<LoanOffersPage />} />
+            <Route path="/loans/apply" element={<RequestLoanPage />} />
+            <Route path="/request-cheque" element={<RequestChequePage accounts={data.accounts} />} />
         </Routes>
     );
 }
 
-// ==================== DASHBOARD HOME ====================
-function DashboardHome({ data, user, navigate, refresh }) {
+function DashboardHome({ data, user, navigate }) {
     return (
-        <div className="min-h-screen bg-background text-foreground pb-20">
-            {/* HERO HEADER */}
-            <header className="px-8 py-10 bg-gradient-to-b from-blue-900/20 to-transparent">
-                <h1 className="text-3xl font-bold">Hello, {user?.username} 👋</h1>
-                <p className="text-gray-400 mt-1">Here is your financial overview</p>
+        // SOLID WORKSPACE BOX: Emerald 200 (Light) / Emerald 800 (Dark)
+        // No Opacity. Pure solid color block.
+        <div className="w-full bg-emerald-200 dark:bg-emerald-800 rounded-3xl border border-emerald-300 dark:border-emerald-700 shadow-sm p-6 md:p-10 pb-20 min-h-[85vh]">
+
+            <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-emerald-300 dark:border-emerald-700 pb-6">
+                <div>
+                    <h1 className="text-4xl font-bold tracking-tight text-emerald-950 dark:text-emerald-50">
+                        Overview
+                    </h1>
+                    <p className="text-emerald-700 dark:text-emerald-300 mt-2 text-lg font-medium">
+                        Welcome back, <span className="text-emerald-900 dark:text-emerald-100 font-bold">{user?.username}</span>.
+                    </p>
+                </div>
+                <div className="text-right hidden md:block">
+                    <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-900 px-3 py-1 rounded-full border border-emerald-300 dark:border-emerald-700">
+                        ID: {user?.userId}
+                    </span>
+                </div>
             </header>
 
-            {/* SECTION 0: QUICK ACTIONS */}
-            <SectionRow title="Quick Actions">
-                <UniversalCard
-                    variant="gradient"
-                    icon="💸"
-                    mainText="Transfer Money"
-                    subText="Send money instantly"
-                    onClick={() => navigate('/customer/transfer')}
-                />
-                <UniversalCard
-                    variant="default"
-                    icon="📋"
-                    mainText="View Requests"
-                    subText="Track applications"
-                    onClick={() => navigate('/customer/requests')}
-                />
-                <UniversalCard
-                    variant="default"
-                    icon="🔐"
-                    mainText="Update PIN"
-                    subText="Change security PIN"
-                    onClick={() => navigate('/customer/update-pin')}
-                />
-            </SectionRow>
+            <div className="space-y-12">
+                <SectionRow title="Quick Actions">
+                    <UniversalCard variant="gradient" icon="💸" mainText="Transfer" subText="Send funds" onClick={() => navigate('/customer/transfer')} />
+                    <UniversalCard variant="default" icon="📋" mainText="History" subText="Track requests" onClick={() => navigate('/customer/requests')} />
+                    <UniversalCard variant="default" icon="🔐" mainText="Security" subText="Update PIN" onClick={() => navigate('/customer/update-pin')} />
+                </SectionRow>
 
-            {/* SECTION 1: ACCOUNTS */}
-            <SectionRow title="My Accounts">
-                <UniversalCard
-                    variant="outline"
-                    icon="+"
-                    mainText="Request Account"
-                    onClick={() => navigate('/customer/request-account')}
-                />
-
-                {data.accounts && data.accounts.length > 0 ? (
-                    data.accounts.map(acc => (
+                <SectionRow title="Accounts">
+                    <UniversalCard variant="outline" icon="+" mainText="New Account" subText="Savings/Current" onClick={() => navigate('/customer/request-account')} />
+                    {data.accounts?.map(acc => (
                         <UniversalCard
                             key={acc.id}
                             variant="gradient"
@@ -156,108 +91,18 @@ function DashboardHome({ data, user, navigate, refresh }) {
                             badge={acc.status}
                             mainText={`₹ ${(acc.availableBalance || 0).toLocaleString('en-IN')}`}
                             subText={acc.accountNumber}
-                            footerLeft="View Details →"
+                            footerLeft="View Details"
                             onClick={() => navigate(`/customer/account/${acc.id}`)}
                         />
-                    ))
-                ) : (
-                    <UniversalCard
-                        variant="default"
-                        mainText="No Accounts"
-                        subText="Request one to get started"
-                    />
-                )}
-            </SectionRow>
+                    ))}
+                </SectionRow>
 
-            {/* SECTION 2: CARDS */}
-            <SectionRow title="My Debit Cards">
-                <UniversalCard
-                    variant="outline"
-                    icon="💳"
-                    mainText="Request Card"
-                    onClick={() => navigate('/customer/cards/request')}
-                />
-
-                {data.cards && data.cards.length > 0 ? (
-                    data.cards.map(card => (
-                        <UniversalCard
-                            key={card.id}
-                            variant="default"
-                            title="DEBIT CARD"
-                            badge={card.isBlocked ? "BLOCKED" : (card.isActive ? "ACTIVE" : "INACTIVE")}
-                            mainText={`•••• ${card.cardNumber?.slice(-4) || '****'}`}
-                            subText={user?.username}
-                            footerRight={card.expiryDate ? new Date(card.expiryDate).toLocaleDateString('en-IN', { month: '2-digit', year: '2-digit' }) : 'N/A'}
-                            onClick={() => navigate('/customer/cards')}
-                        />
-                    ))
-                ) : (
-                    <UniversalCard
-                        variant="default"
-                        mainText="No Cards"
-                        subText="Request one for your account"
-                    />
-                )}
-            </SectionRow>
-
-            {/* SECTION 3: LOANS */}
-            <SectionRow title="Loans & Credit">
-                <UniversalCard
-                    variant="outline"
-                    icon="💰"
-                    mainText="View Offers"
-                    subText="Check eligibility"
-                    onClick={() => navigate('/customer/loans')}
-                />
-
-                {data.loans && data.loans.length > 0 ? (
-                    data.loans.map(loan => (
-                        <UniversalCard
-                            key={loan.id}
-                            variant="default"
-                            title="LOAN"
-                            badge={loan.status}
-                            mainText={`₹ ${(loan.requestedAmount || 0).toLocaleString('en-IN')}`}
-                            subText={`${loan.requestedTenureMonths} months`}
-                            footerLeft={loan.purpose?.substring(0, 20) + '...'}
-                        />
-                    ))
-                ) : (
-                    <UniversalCard
-                        variant="default"
-                        mainText="No Active Loans"
-                        subText="Explore offers"
-                    />
-                )}
-            </SectionRow>
-
-            {/* SECTION 4: REQUEST SERVICES */}
-            <SectionRow title="Request Services">
-                <UniversalCard
-                    variant="default"
-                    icon="🏦"
-                    mainText="Request Account"
-                    onClick={() => navigate('/customer/request-account')}
-                />
-                <UniversalCard
-                    variant="default"
-                    icon="💳"
-                    mainText="Request Card"
-                    onClick={() => navigate('/customer/cards/request')}
-                />
-                <UniversalCard
-                    variant="default"
-                    icon="📋"
-                    mainText="Cheque Book"
-                    onClick={() => navigate('/customer/request-cheque')}
-                />
-                <UniversalCard
-                    variant="default"
-                    icon="💼"
-                    mainText="Apply for Loan"
-                    onClick={() => navigate('/customer/loans/apply')}
-                />
-            </SectionRow>
+                <SectionRow title="Services">
+                    <UniversalCard variant="default" icon="💳" mainText="Debit Cards" subText="Manage cards" onClick={() => navigate('/customer/cards')} />
+                    <UniversalCard variant="default" icon="💰" mainText="Loans" subText="Apply & View" onClick={() => navigate('/customer/loans')} />
+                    <UniversalCard variant="default" icon="📓" mainText="Cheque Book" subText="Request new" onClick={() => navigate('/customer/request-cheque')} />
+                </SectionRow>
+            </div>
         </div>
     );
 }

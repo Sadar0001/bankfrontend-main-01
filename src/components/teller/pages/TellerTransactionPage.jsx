@@ -3,33 +3,33 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { performTellerTransaction } from "../../../services/teller-api-service";
 import useAuthStore from "../../../store/authStore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function TellerTransactionPage() {
     const navigate = useNavigate();
-    const user = useAuthStore(state => state.user); // To get Branch ID if needed
-    const { register, handleSubmit, watch, reset, setValue } = useForm({
+    const user = useAuthStore(state => state.user);
+    const { register, handleSubmit, watch, reset } = useForm({
         defaultValues: {
             transactionType: "DEPOSIT",
             bankType: "BANK_BRANCH",
             accountHolderType: "CUSTOMER",
             description: "Teller Transaction",
-            // Assuming the teller's branch ID is known or user enters it.
-            // Often backend extracts from token, but DTO asks for it.
-            bankId: 1 // Defaulting to 1 for now, or fetch from user context
+            bankId: 1
         }
     });
 
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState({ type: '', msg: '' });
 
-    // Watch transaction type to toggle fields
     const txnType = watch("transactionType");
 
     const onSubmit = async (data) => {
         setIsLoading(true);
         setStatus({ type: '', msg: '' });
 
-        // Clean up data based on type
         const payload = { ...data };
         if (txnType === 'DEPOSIT') delete payload.senderAccountNumber;
         if (txnType === 'WITHDRAWAL') delete payload.receiverAccountNumber;
@@ -37,7 +37,7 @@ export default function TellerTransactionPage() {
         try {
             await performTellerTransaction(payload);
             setStatus({ type: 'success', msg: `Transaction Successful!` });
-            reset({ ...data, amount: "", senderAccountNumber: "", receiverAccountNumber: "" }); // Reset inputs but keep settings
+            reset({ ...data, amount: "", senderAccountNumber: "", receiverAccountNumber: "" });
         } catch (err) {
             console.error(err);
             setStatus({ type: 'error', msg: err.response?.data?.message || "Transaction Failed" });
@@ -47,108 +47,101 @@ export default function TellerTransactionPage() {
     };
 
     return (
-        <div className="p-8 text-white min-h-screen flex flex-col items-center">
+        <div className="flex flex-col items-center p-8 min-h-[85vh]">
             <div className="w-full max-w-2xl">
-                <button onClick={() => navigate('/teller')} className="text-blue-400 mb-6 hover:underline">
-                    ← Back to Dashboard
-                </button>
+                <Button variant="ghost" onClick={() => navigate('/teller')} className="mb-6 text-emerald-200 hover:text-white hover:bg-emerald-800 font-bold self-start">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+                </Button>
 
-                <div className="bg-gray-900 border border-gray-700 rounded-xl p-8 shadow-2xl">
-                    <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-                        <span className="text-green-500">💸</span> Perform Transaction
+                <div className="bg-white dark:bg-emerald-900 border border-emerald-300 dark:border-emerald-700 rounded-3xl p-8 shadow-sm">
+                    <h2 className="text-3xl font-extrabold mb-6 flex items-center gap-3 text-emerald-950 dark:text-emerald-50">
+                        <span className="text-emerald-500">💸</span> Perform Transaction
                     </h2>
 
                     {status.msg && (
-                        <div className={`p-4 rounded mb-6 text-center font-bold ${
-                            status.type === 'success' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-red-900/30 text-red-400 border border-red-800'
+                        <div className={`p-4 rounded-lg mb-6 flex items-center gap-2 font-bold border ${
+                            status.type === 'success'
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-800 dark:text-emerald-100 dark:border-emerald-600'
+                                : 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
                         }`}>
+                            {status.type === 'success' ? <CheckCircle2 className="h-5 w-5"/> : <AlertCircle className="h-5 w-5"/>}
                             {status.msg}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
-                        {/* Transaction Type Selector */}
+                        {/* Transaction Type Radio */}
                         <div className="grid grid-cols-3 gap-4">
                             {['DEPOSIT', 'WITHDRAWAL', 'TRANSFER'].map(type => (
                                 <label key={type} className={`
-                                    cursor-pointer text-center py-3 rounded-lg border transition-all font-bold
+                                    cursor-pointer text-center py-4 rounded-xl border-2 transition-all font-bold text-sm tracking-wide
                                     ${txnType === type
-                                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg scale-105'
-                                    : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'}
+                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-md transform scale-105'
+                                    : 'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-800'}
                                 `}>
-                                    <input
-                                        type="radio"
-                                        value={type}
-                                        {...register("transactionType")}
-                                        className="hidden"
-                                    />
+                                    <input type="radio" value={type} {...register("transactionType")} className="hidden" />
                                     {type}
                                 </label>
                             ))}
                         </div>
 
-                        {/* Account Inputs */}
-                        <div className="space-y-4 bg-gray-800/50 p-6 rounded-lg border border-gray-700">
-                            {/* Sender Account (Hidden for DEPOSIT) */}
+                        {/* Solid Form Box */}
+                        <div className="space-y-5 bg-emerald-50 dark:bg-emerald-950 p-6 rounded-2xl border border-emerald-200 dark:border-emerald-800">
                             {txnType !== 'DEPOSIT' && (
                                 <div>
-                                    <label className="block text-sm text-gray-400 mb-1">From Account (Sender)</label>
-                                    <input
+                                    <Label className="text-emerald-900 dark:text-emerald-100">From Account (Sender)</Label>
+                                    <Input
                                         {...register("senderAccountNumber", { required: txnType !== 'DEPOSIT' })}
                                         placeholder="e.g. ACC-1001"
-                                        className="w-full bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-blue-500 outline-none"
+                                        className="mt-1 bg-white dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700 text-lg font-mono font-bold"
                                     />
                                 </div>
                             )}
 
-                            {/* Receiver Account (Hidden for WITHDRAWAL) */}
                             {txnType !== 'WITHDRAWAL' && (
                                 <div>
-                                    <label className="block text-sm text-gray-400 mb-1">To Account (Receiver)</label>
-                                    <input
+                                    <Label className="text-emerald-900 dark:text-emerald-100">To Account (Receiver)</Label>
+                                    <Input
                                         {...register("receiverAccountNumber", { required: txnType !== 'WITHDRAWAL' })}
                                         placeholder="e.g. ACC-2002"
-                                        className="w-full bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-blue-500 outline-none"
+                                        className="mt-1 bg-white dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700 text-lg font-mono font-bold"
                                     />
                                 </div>
                             )}
 
-                            {/* Amount */}
                             <div>
-                                <label className="block text-sm text-gray-400 mb-1">Amount (₹)</label>
-                                <input
+                                <Label className="text-emerald-900 dark:text-emerald-100">Amount (₹)</Label>
+                                <Input
                                     type="number"
                                     step="0.01"
                                     {...register("amount", { required: true, min: 1 })}
                                     placeholder="0.00"
-                                    className="w-full bg-gray-900 border border-gray-600 rounded p-3 text-white text-xl font-mono focus:border-green-500 outline-none"
+                                    className="mt-1 bg-white dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700 text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400"
+                                />
+                            </div>
+
+                            <div>
+                                <Label className="text-emerald-900 dark:text-emerald-100">Description</Label>
+                                <Input
+                                    {...register("description")}
+                                    placeholder="e.g. Cash Deposit by Self"
+                                    className="mt-1 bg-white dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700"
                                 />
                             </div>
                         </div>
 
-                        {/* Hidden Technical Fields */}
                         <input type="hidden" {...register("bankType")} />
                         <input type="hidden" {...register("bankId")} />
                         <input type="hidden" {...register("accountHolderType")} />
 
-                        {/* Description */}
-                        <div>
-                            <label className="block text-sm text-gray-400 mb-1">Description (Optional)</label>
-                            <input
-                                {...register("description")}
-                                placeholder="e.g. Cash Deposit by Self"
-                                className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white text-sm"
-                            />
-                        </div>
-
-                        <button
+                        <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-lg shadow-lg transition transform active:scale-[0.98]"
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-lg py-6 rounded-xl shadow-md"
                         >
                             {isLoading ? "Processing..." : `CONFIRM ${txnType}`}
-                        </button>
+                        </Button>
                     </form>
                 </div>
             </div>

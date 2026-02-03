@@ -3,6 +3,11 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { getBranchCustomers, updateCustomer } from "../../../services/teller-api-service";
 import Modal from "../../Modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft } from "lucide-react";
 
 export default function TellerCustomersPage() {
     const navigate = useNavigate();
@@ -20,7 +25,6 @@ export default function TellerCustomersPage() {
 
     const openEditModal = (cust) => {
         setSelectedCust(cust);
-        // Pre-fill form
         setValue("firstName", cust.firstName);
         setValue("lastName", cust.lastName);
         setValue("email", cust.email);
@@ -40,35 +44,39 @@ export default function TellerCustomersPage() {
     };
 
     return (
-        <div className="p-8 text-white min-h-screen">
-            <button onClick={() => navigate('/teller')} className="text-blue-400 mb-6">← Back to Dashboard</button>
-            <h2 className="text-3xl font-bold mb-6">Branch Customers</h2>
+        // SOLID WORKSPACE
+        <div className="w-full bg-emerald-200 dark:bg-emerald-800 rounded-3xl border border-emerald-300 dark:border-emerald-700 shadow-none p-6 md:p-10 min-h-[85vh]">
+            <Button variant="ghost" onClick={() => navigate('/teller')} className="mb-6 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-300 dark:hover:bg-emerald-700 font-bold">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+            </Button>
+            <h2 className="text-3xl font-extrabold text-emerald-950 dark:text-emerald-50 mb-6">Branch Customers</h2>
 
-            <div className="bg-gray-900 rounded-xl border border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-emerald-900 rounded-xl border border-emerald-300 dark:border-emerald-700 overflow-hidden">
                 <table className="w-full text-left">
-                    <thead className="bg-gray-800 text-gray-400 text-xs uppercase">
+                    <thead className="bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 text-xs font-bold uppercase">
                     <tr>
-                        <th className="p-4">Customer ID</th>
-                        <th className="p-4">Name</th>
-                        <th className="p-4">Email</th>
-                        <th className="p-4">Phone</th>
-                        <th className="p-4 text-right">Action</th>
+                        <th className="p-4 border-b border-emerald-300 dark:border-emerald-700">Customer ID</th>
+                        <th className="p-4 border-b border-emerald-300 dark:border-emerald-700">Name</th>
+                        <th className="p-4 border-b border-emerald-300 dark:border-emerald-700">Email</th>
+                        <th className="p-4 border-b border-emerald-300 dark:border-emerald-700">Phone</th>
+                        <th className="p-4 border-b border-emerald-300 dark:border-emerald-700 text-right">Action</th>
                     </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-800">
+                    <tbody className="divide-y divide-emerald-200 dark:divide-emerald-800">
                     {customers.map(c => (
-                        <tr key={c.id} className="hover:bg-gray-800/50">
-                            <td className="p-4 font-mono">{c.customerId}</td>
-                            <td className="p-4 font-bold">{c.firstName} {c.lastName}</td>
-                            <td className="p-4 text-gray-400">{c.email}</td>
-                            <td className="p-4 text-gray-400">{c.phone}</td>
+                        <tr key={c.id} className="hover:bg-emerald-50 dark:hover:bg-emerald-800/50 transition-colors">
+                            <td className="p-4 font-mono text-emerald-900 dark:text-emerald-100 font-medium">{c.customerId}</td>
+                            <td className="p-4 font-bold text-emerald-950 dark:text-white">{c.firstName} {c.lastName}</td>
+                            <td className="p-4 text-emerald-700 dark:text-emerald-300">{c.email}</td>
+                            <td className="p-4 text-emerald-700 dark:text-emerald-300">{c.phone}</td>
                             <td className="p-4 text-right">
-                                <button
+                                <Button
+                                    size="sm"
                                     onClick={() => openEditModal(c)}
-                                    className="bg-blue-600/20 text-blue-400 border border-blue-600 px-4 py-1 rounded hover:bg-blue-600 hover:text-white transition"
+                                    className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-800 dark:text-emerald-100 dark:hover:bg-emerald-700 border border-emerald-300 dark:border-emerald-600 font-bold"
                                 >
                                     Edit Details
-                                </button>
+                                </Button>
                             </td>
                         </tr>
                     ))}
@@ -76,34 +84,33 @@ export default function TellerCustomersPage() {
                 </table>
             </div>
 
-            {/* EDIT MODAL */}
             <Modal isOpen={!!selectedCust} onClose={() => setSelectedCust(null)} title="Update Customer Details">
                 <form onSubmit={handleSubmit(onUpdate)} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">First Name</label>
-                            <input {...register("firstName")} className="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white" />
+                            <Label className="text-emerald-900 dark:text-emerald-100">First Name</Label>
+                            <Input {...register("firstName")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700" />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Last Name</label>
-                            <input {...register("lastName")} className="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white" />
+                            <Label className="text-emerald-900 dark:text-emerald-100">Last Name</Label>
+                            <Input {...register("lastName")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700" />
                         </div>
                     </div>
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">Email</label>
-                        <input {...register("email")} className="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white" />
+                        <Label className="text-emerald-900 dark:text-emerald-100">Email</Label>
+                        <Input {...register("email")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700" />
                     </div>
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">Phone</label>
-                        <input {...register("phone")} className="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white" />
+                        <Label className="text-emerald-900 dark:text-emerald-100">Phone</Label>
+                        <Input {...register("phone")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700" />
                     </div>
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">Address</label>
-                        <textarea {...register("address")} rows="2" className="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white" />
+                        <Label className="text-emerald-900 dark:text-emerald-100">Address</Label>
+                        <Textarea {...register("address")} rows="2" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700" />
                     </div>
-                    <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded">
+                    <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11">
                         Save Changes
-                    </button>
+                    </Button>
                 </form>
             </Modal>
         </div>

@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { getAllBranches, addBranch, deactivateBranch } from "../../../services/head-bank-api-service";
 import Modal from "../../Modal";
 import useAuthStore from "../../../store/authStore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Plus, Building2, MapPin, Phone } from "lucide-react";
 
 export default function ManageBranchesPage() {
     const navigate = useNavigate();
@@ -20,17 +25,6 @@ export default function ManageBranchesPage() {
 
     const onAdd = async (data) => {
         try {
-            // Need to pass headBankId from somewhere. Assuming user context has it or derived.
-            // For now, prompt asking or hardcode if user object doesn't have it explicitly.
-            // Ideally, the backend validates the token, but DTO needs the ID.
-            // Let's assume we fetch user profile or pass '1' for test if context missing.
-            
-            // NOTE: In your controller logic:
-            // if (!branchDTO.getHeadBankId().equals(details.getHeadBankId())) exception
-            // So we MUST send the correct HeadBankID. 
-            // In a real app, this ID comes from user profile.
-            // For this UI, I'll add an input field for HeadBankID to be safe.
-            
             await addBranch(data);
             alert("Branch Added!");
             setIsModalOpen(false);
@@ -53,44 +47,81 @@ export default function ManageBranchesPage() {
     }
 
     return (
-        <div className="p-8 text-white min-h-screen">
-            <button onClick={() => navigate('/headbank')} className="text-blue-400 mb-6">← Back</button>
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold">Manage Branches</h2>
-                <button onClick={() => setIsModalOpen(true)} className="bg-green-600 px-6 py-2 rounded font-bold">+ Add Branch</button>
+        // LAYER 2: WORKSPACE BOX (Solid Emerald 200/800)
+        <div className="w-full bg-emerald-200 dark:bg-emerald-800 rounded-3xl border border-emerald-300 dark:border-emerald-700 shadow-none p-6 md:p-10 min-h-[85vh]">
+
+            <div className="flex items-center justify-between mb-8">
+                <Button variant="ghost" onClick={() => navigate('/headbank')} className="text-emerald-800 dark:text-emerald-200 hover:bg-emerald-300 dark:hover:bg-emerald-700">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                </Button>
+                <h2 className="text-3xl font-extrabold text-emerald-950 dark:text-emerald-50">Manage Branches</h2>
+                <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-none">
+                    <Plus className="mr-2 h-4 w-4" /> Add Branch
+                </Button>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {branches.map(b => (
-                    <div key={b.id} className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <div className="flex justify-between mb-2">
-                            <h3 className="font-bold text-xl">{b.name}</h3>
-                            <span className={`px-2 py-0.5 text-xs rounded ${b.isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
-                                {b.isActive ? "ACTIVE" : "INACTIVE"}
-                            </span>
-                        </div>
-                        <p className="text-sm text-gray-400">Code: {b.branchCode}</p>
-                        <p className="text-sm text-gray-400">IFSC: {b.ifscCode}</p>
-                        <p className="text-sm text-gray-500 mt-2">{b.address}</p>
+                    // LAYER 3: CONTENT CARDS (Solid White / Emerald 900)
+                    <Card key={b.id} className="bg-white dark:bg-emerald-900 border-emerald-100 dark:border-emerald-700 shadow-sm hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-3">
+                            <div className="flex justify-between items-start">
+                                <CardTitle className="text-xl font-bold text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
+                                    <Building2 className="h-5 w-5 text-emerald-500" />
+                                    {b.name}
+                                </CardTitle>
+                                <Badge className={b.isActive ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-800 dark:text-emerald-200 hover:bg-emerald-200" : "bg-red-100 text-red-700 hover:bg-red-200"}>
+                                    {b.isActive ? "ACTIVE" : "INACTIVE"}
+                                </Badge>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-3 text-sm text-emerald-700 dark:text-emerald-300">
+                            <div className="flex justify-between border-b border-emerald-50 dark:border-emerald-800 pb-2">
+                                <span>Code:</span> <span className="font-mono font-bold">{b.branchCode}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-emerald-50 dark:border-emerald-800 pb-2">
+                                <span>IFSC:</span> <span className="font-mono font-bold">{b.ifscCode}</span>
+                            </div>
+                            <div className="flex items-start gap-2 pt-1">
+                                <MapPin className="h-4 w-4 shrink-0 opacity-70" />
+                                <span className="line-clamp-2">{b.address}</span>
+                            </div>
+                            {b.contactNumber && (
+                                <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4 shrink-0 opacity-70" />
+                                    <span>{b.contactNumber}</span>
+                                </div>
+                            )}
+                        </CardContent>
                         {b.isActive && (
-                            <button onClick={() => onDelete(b.id)} className="mt-4 w-full border border-red-600 text-red-400 py-1 rounded hover:bg-red-900/20">
-                                Deactivate
-                            </button>
+                            <CardFooter>
+                                <Button
+                                    onClick={() => onDelete(b.id)}
+                                    variant="outline"
+                                    className="w-full border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
+                                >
+                                    Deactivate Branch
+                                </Button>
+                            </CardFooter>
                         )}
-                    </div>
+                    </Card>
                 ))}
             </div>
 
-            {/* ADD MODAL */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Branch">
-                <form onSubmit={handleSubmit(onAdd)} className="space-y-4 text-gray-800">
-                    <input {...register("name")} placeholder="Branch Name" className="w-full p-2 rounded" required />
-                    <input {...register("branchCode")} placeholder="Branch Code (e.g. BR005)" className="w-full p-2 rounded" required />
-                    <input {...register("ifscCode")} placeholder="IFSC Code" className="w-full p-2 rounded" required />
-                    <input {...register("address")} placeholder="Address" className="w-full p-2 rounded" required />
-                    <input {...register("contactNumber")} placeholder="Phone" className="w-full p-2 rounded" />
-                    <input type="number" {...register("headBankId")} placeholder="Head Bank ID" className="w-full p-2 rounded" required />
-                    <button className="w-full bg-green-600 text-white py-2 rounded font-bold">Create Branch</button>
+                <form onSubmit={handleSubmit(onAdd)} className="space-y-4">
+                    <Input {...register("name")} placeholder="Branch Name" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input {...register("branchCode")} placeholder="Code (e.g. BR005)" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
+                        <Input {...register("ifscCode")} placeholder="IFSC Code" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
+                    </div>
+                    <Input {...register("address")} placeholder="Full Address" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
+                    <Input {...register("contactNumber")} placeholder="Contact Number" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" />
+                    <Input type="number" {...register("headBankId")} placeholder="Head Bank ID" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
+
+                    <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+                        Create Branch
+                    </Button>
                 </form>
             </Modal>
         </div>

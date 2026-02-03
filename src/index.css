@@ -4,50 +4,89 @@
 
 @layer base {
     :root {
-        /* SLATE BASE - LIGHT MODE */
-        --background: 0 0% 100%;
-        --foreground: 222.2 84% 4.9%;
+        /* --- SOLID EMERALD THEME (Light Mode) --- */
+
+        /* Background: Emerald 50 (Solid) */
+        --background: 152 81% 96%;
+
+        /* Foreground: Emerald 950 (High Contrast Text) */
+        --foreground: 166 91% 9%;
+
+        /* Card: White (Solid) */
         --card: 0 0% 100%;
-        --card-foreground: 222.2 84% 4.9%;
+        --card-foreground: 166 91% 9%;
+
+        /* Popover: White */
         --popover: 0 0% 100%;
-        --popover-foreground: 222.2 84% 4.9%;
-        --primary: 222.2 47.4% 11.2%;
-        --primary-foreground: 210 40% 98%;
-        --secondary: 210 40% 96.1%;
-        --secondary-foreground: 222.2 47.4% 11.2%;
-        --muted: 210 40% 96.1%;
-        --muted-foreground: 215.4 16.3% 46.9%;
-        --accent: 210 40% 96.1%;
-        --accent-foreground: 222.2 47.4% 11.2%;
+        --popover-foreground: 166 91% 9%;
+
+        /* Primary: Emerald 600 (Solid Action Color) */
+        --primary: 161 94% 30%;
+        --primary-foreground: 0 0% 100%;
+
+        /* Secondary: Emerald 200 (Solid Secondary Elements) */
+        --secondary: 152 76% 80%;
+        --secondary-foreground: 166 91% 9%;
+
+        /* Muted: Emerald 100 */
+        --muted: 149 80% 90%;
+        --muted-foreground: 163 88% 20%;
+
+        /* Accent: Emerald 200 (Hover State) */
+        --accent: 152 76% 80%;
+        --accent-foreground: 166 91% 9%;
+
+        /* Destructive: Red */
         --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 214.3 31.8% 91.4%;
-        --input: 214.3 31.8% 91.4%;
-        --ring: 222.2 84% 4.9%;
+        --destructive-foreground: 0 0% 98%;
+
+        /* Border: Emerald 300 (Visible Lines) */
+        --border: 156 72% 67%;
+        --input: 156 72% 67%;
+        --ring: 161 94% 30%;
+
         --radius: 0.5rem;
     }
 
     .dark {
-        /* SLATE BASE - DARK MODE */
-        --background: 222.2 84% 4.9%;
-        --foreground: 210 40% 98%;
-        --card: 222.2 84% 4.9%;
-        --card-foreground: 210 40% 98%;
-        --popover: 222.2 84% 4.9%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 210 40% 98%;
-        --primary-foreground: 222.2 47.4% 11.2%;
-        --secondary: 217.2 32.6% 17.5%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 217.2 32.6% 17.5%;
-        --muted-foreground: 215 20.2% 65.1%;
-        --accent: 217.2 32.6% 17.5%;
-        --accent-foreground: 210 40% 98%;
+        /* --- SOLID DEEP EMERALD (Dark Mode) --- */
+
+        /* Background: Emerald 950 (Solid Dark) */
+        --background: 166 91% 9%;
+
+        /* Foreground: Emerald 50 (Light Text) */
+        --foreground: 152 81% 96%;
+
+        /* Card: Emerald 900 (Distinct from BG) */
+        --card: 164 86% 16%;
+        --card-foreground: 152 81% 96%;
+
+        --popover: 164 86% 16%;
+        --popover-foreground: 152 81% 96%;
+
+        /* Primary: Emerald 500 (Brighter for Dark Mode) */
+        --primary: 160 84% 39%;
+        --primary-foreground: 166 91% 9%;
+
+        /* Secondary: Emerald 800 */
+        --secondary: 163 88% 20%;
+        --secondary-foreground: 152 81% 96%;
+
+        /* Muted: Emerald 800 */
+        --muted: 163 88% 20%;
+        --muted-foreground: 152 76% 80%;
+
+        /* Accent: Emerald 800 */
+        --accent: 163 88% 20%;
+        --accent-foreground: 152 81% 96%;
+
         --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 217.2 32.6% 17.5%;
-        --input: 217.2 32.6% 17.5%;
-        --ring: 212.7 26.8% 83.9%;
+        --destructive-foreground: 0 0% 98%;
+
+        /* Border: Emerald 700 */
+        --border: 163 94% 24%;
+        --input: 163 94% 24%;
+        --ring: 160 84% 39%;
     }
 }
 
@@ -57,16 +96,5 @@
     }
     body {
         @apply bg-background text-foreground;
-    }
-}
-
-@layer utilities {
-    /* PROFESSIONAL GRID PATTERN */
-    .bg-grid-pattern {
-        background-size: 40px 40px;
-        background-image:
-                linear-gradient(to right, hsl(var(--border) / 0.3) 1px, transparent 1px),
-                linear-gradient(to bottom, hsl(var(--border) / 0.3) 1px, transparent 1px);
-        background-position: center top;
     }
 }

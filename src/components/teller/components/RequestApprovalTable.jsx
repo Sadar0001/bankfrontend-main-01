@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function RequestApprovalTable({ title, fetchData, onApprove, onReject }) {
     const [requests, setRequests] = useState([]);
@@ -41,7 +44,6 @@ export default function RequestApprovalTable({ title, fetchData, onApprove, onRe
         }
     };
 
-    // Helper to extract specific details based on request type
     const getDetail = (req) => {
         if (req.accountType) return `Type: ${req.accountType}`;
         if (req.cardType) return `Card: ${req.cardType}`;
@@ -50,77 +52,79 @@ export default function RequestApprovalTable({ title, fetchData, onApprove, onRe
     };
 
     return (
-        <div className="bg-gray-900 rounded-xl border border-gray-700 overflow-hidden">
-            <div className="p-4 bg-gray-800 border-b border-gray-700">
-                <h3 className="text-lg font-bold text-white">{title}</h3>
+        <div className="bg-white dark:bg-emerald-900 rounded-xl border border-emerald-300 dark:border-emerald-700 overflow-hidden shadow-sm">
+            <div className="p-4 bg-emerald-100 dark:bg-emerald-950 border-b border-emerald-200 dark:border-emerald-800">
+                <h3 className="text-lg font-bold text-emerald-900 dark:text-emerald-100">{title}</h3>
             </div>
 
-            {loading ? <div className="p-8 text-center text-gray-400">Loading...</div> : (
-                <table className="w-full text-left text-sm text-gray-300">
-                    <thead className="bg-gray-800/50 text-xs uppercase text-gray-500">
+            {loading ? <div className="p-8 text-center text-emerald-600 font-medium">Loading...</div> : (
+                <table className="w-full text-left text-sm">
+                    <thead className="bg-emerald-50 dark:bg-emerald-900/50 text-xs uppercase text-emerald-700 dark:text-emerald-300 font-bold">
                     <tr>
-                        <th className="p-4">Req ID</th>
-                        <th className="p-4">Customer / Account</th>
-                        <th className="p-4">Details</th>
-                        <th className="p-4">Status</th>
-                        <th className="p-4 text-right">Actions</th>
+                        <th className="p-4 border-b border-emerald-200 dark:border-emerald-700">Req ID</th>
+                        <th className="p-4 border-b border-emerald-200 dark:border-emerald-700">Customer / Account</th>
+                        <th className="p-4 border-b border-emerald-200 dark:border-emerald-700">Details</th>
+                        <th className="p-4 border-b border-emerald-200 dark:border-emerald-700">Status</th>
+                        <th className="p-4 border-b border-emerald-200 dark:border-emerald-700 text-right">Actions</th>
                     </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-800">
+                    <tbody className="divide-y divide-emerald-100 dark:divide-emerald-800">
                     {requests.length > 0 ? requests.map(req => (
-                        <tr key={req.id} className="hover:bg-gray-800/50">
-                            <td className="p-4 font-mono">{req.id}</td>
-                            <td className="p-4">
+                        <tr key={req.id} className="hover:bg-emerald-50 dark:hover:bg-emerald-800/50 transition-colors">
+                            <td className="p-4 font-mono text-emerald-900 dark:text-emerald-100">{req.id}</td>
+                            <td className="p-4 text-emerald-900 dark:text-emerald-100">
                                 {req.requestedBy?.customerId || req.customer?.customerId}
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-emerald-500 font-medium">
                                     {req.account?.accountNumber ? `Acc: ${req.account.accountNumber}` : 'New Account'}
                                 </div>
                             </td>
-                            <td className="p-4 text-white font-medium">{getDetail(req)}</td>
+                            <td className="p-4 text-emerald-800 dark:text-emerald-200 font-medium">{getDetail(req)}</td>
                             <td className="p-4">
-                                    <span className="px-2 py-1 rounded text-xs border border-yellow-600 text-yellow-400 bg-yellow-900/20">
-                                        {req.status}
-                                    </span>
+                                <Badge variant="outline" className="border-yellow-400 text-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-400">
+                                    {req.status}
+                                </Badge>
                             </td>
                             <td className="p-4 text-right space-x-2">
-                                <button
+                                <Button
+                                    size="sm"
+                                    variant="outline"
                                     onClick={() => setSelectedReq(req)}
-                                    className="px-3 py-1 text-red-400 hover:bg-red-900/30 rounded border border-red-800"
+                                    className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950 font-bold"
                                 >
                                     Reject
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    size="sm"
                                     onClick={() => handleApprove(req.id)}
-                                    className="px-3 py-1 text-green-400 hover:bg-green-900/30 rounded border border-green-800"
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
                                 >
                                     Approve
-                                </button>
+                                </Button>
                             </td>
                         </tr>
                     )) : (
-                        <tr><td colSpan="5" className="p-8 text-center">No pending requests</td></tr>
+                        <tr><td colSpan="5" className="p-8 text-center text-emerald-500 font-medium">No pending requests</td></tr>
                     )}
                     </tbody>
                 </table>
             )}
 
-            {/* REJECT MODAL */}
             <Modal isOpen={!!selectedReq} onClose={() => setSelectedReq(null)} title="Reject Request">
                 <div className="space-y-4">
-                    <p className="text-gray-300">Please provide a reason for rejection:</p>
-                    <textarea
-                        className="w-full bg-gray-800 border border-gray-600 rounded p-3 text-white"
+                    <p className="text-emerald-800 dark:text-emerald-200 font-medium">Please provide a reason for rejection:</p>
+                    <Textarea
+                        className="bg-emerald-50 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-100 focus:ring-emerald-500"
                         rows="3"
                         placeholder="e.g. Invalid Documents"
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                     />
-                    <button
+                    <Button
                         onClick={handleReject}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold"
                     >
                         Confirm Rejection
-                    </button>
+                    </Button>
                 </div>
             </Modal>
         </div>

@@ -3,6 +3,11 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { getAllCardRules, addCardRule, deactivateCardRule } from "../../../services/head-bank-api-service";
 import Modal from "../../Modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { ArrowLeft, CreditCard } from "lucide-react";
 
 export default function ManageCardRulesPage() {
     const navigate = useNavigate();
@@ -10,20 +15,16 @@ export default function ManageCardRulesPage() {
     const [rules, setRules] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Load Data
     const loadRules = () => {
-        getAllCardRules()
-            .then(res => setRules(res.data?.data || []))
-            .catch(console.error);
+        getAllCardRules().then(res => setRules(res.data?.data || [])).catch(console.error);
     };
 
     useEffect(() => { loadRules(); }, []);
 
-    // Add Rule Handler
     const onAdd = async (data) => {
         try {
             await addCardRule(data);
-            alert("Card Rule Created Successfully!");
+            alert("Rule Created!");
             setIsModalOpen(false);
             reset();
             loadRules();
@@ -32,160 +33,104 @@ export default function ManageCardRulesPage() {
         }
     };
 
-    // Deactivate Handler
     const onDelete = async (id) => {
-        if (!confirm("Are you sure you want to deactivate this rule?")) return;
+        if (!confirm("Deactivate this rule?")) return;
         try {
             await deactivateCardRule(id);
             loadRules();
-        } catch (err) {
-            alert("Failed to deactivate rule");
-        }
+        } catch (err) { alert("Failed to deactivate"); }
     };
 
     return (
-        <div className="p-8 text-white min-h-screen">
-            <button onClick={() => navigate('/headbank')} className="text-blue-400 mb-6 hover:underline">
-                ← Back to Dashboard
-            </button>
-            
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold">Debit Card Rules</h2>
-                <button 
-                    onClick={() => setIsModalOpen(true)} 
-                    className="bg-purple-600 px-6 py-2 rounded font-bold hover:bg-purple-700 transition"
-                >
+        // SOLID WORKSPACE
+        <div className="w-full bg-emerald-200 dark:bg-emerald-800 rounded-3xl border border-emerald-300 dark:border-emerald-700 shadow-none p-6 md:p-10 min-h-[85vh]">
+
+            <div className="flex justify-between items-center mb-8">
+                <Button variant="ghost" onClick={() => navigate('/headbank')} className="text-emerald-800 dark:text-emerald-200 hover:bg-emerald-300 dark:hover:bg-emerald-700">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                </Button>
+                <h2 className="text-3xl font-extrabold text-emerald-950 dark:text-emerald-50">Debit Card Rules</h2>
+                <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
                     + Create Rule
-                </button>
+                </Button>
             </div>
 
-            {/* RULES GRID */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rules.map(rule => (
-                    <div key={rule.id} className="bg-gray-800 p-6 rounded-xl border border-gray-700 relative shadow-lg">
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="font-bold text-lg text-white">{rule.cardType}</h3>
-                            <span className={`px-2 py-0.5 text-xs rounded border ${
-                                rule.isActive 
-                                    ? 'bg-green-900/30 text-green-400 border-green-800' 
-                                    : 'bg-red-900/30 text-red-400 border-red-800'
-                            }`}>
+                    // SOLID CARD
+                    <Card key={rule.id} className="bg-white dark:bg-emerald-900 border-emerald-100 dark:border-emerald-700 shadow-sm overflow-hidden">
+                        <div className="bg-emerald-50 dark:bg-emerald-950 p-4 border-b border-emerald-100 dark:border-emerald-800 flex justify-between items-center">
+                            <h3 className="font-bold text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
+                                <CreditCard className="h-4 w-4" /> {rule.cardType}
+                            </h3>
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded ${rule.isActive ? 'bg-emerald-200 text-emerald-800' : 'bg-red-200 text-red-800'}`}>
                                 {rule.isActive ? "ACTIVE" : "INACTIVE"}
                             </span>
                         </div>
 
-                        <div className="space-y-2 text-sm text-gray-300">
-                            <div className="flex justify-between border-b border-gray-700 pb-1">
+                        <CardContent className="p-5 space-y-3 text-sm text-emerald-800 dark:text-emerald-200">
+                            <div className="flex justify-between">
                                 <span>Annual Fee:</span>
-                                <span className="font-bold text-white">₹ {rule.annualFee}</span>
+                                <span className="font-bold">₹ {rule.annualFee}</span>
                             </div>
-                            <div className="flex justify-between border-b border-gray-700 pb-1">
-                                <span>Daily Withdraw Limit:</span>
-                                <span className="text-white">₹ {rule.dailyWithdrawalLimit}</span>
+                            <div className="flex justify-between">
+                                <span>Withdraw Limit:</span>
+                                <span className="font-mono">₹ {rule.dailyWithdrawalLimit}</span>
                             </div>
-                            <div className="flex justify-between border-b border-gray-700 pb-1">
-                                <span>Daily Txn Limit:</span>
-                                <span className="text-white">₹ {rule.dailyTransactionLimit}</span>
+                            <div className="flex justify-between">
+                                <span>Txn Limit:</span>
+                                <span className="font-mono">₹ {rule.dailyTransactionLimit}</span>
                             </div>
-                            <div className="flex justify-between pt-1">
+                            <div className="flex justify-between pt-2 border-t border-emerald-100 dark:border-emerald-800">
                                 <span>International:</span>
-                                <span className={rule.internationalUsage ? "text-green-400" : "text-gray-500"}>
-                                    {rule.internationalUsage ? "Allowed" : "Not Allowed"}
+                                <span className={rule.internationalUsage ? "text-emerald-600 font-bold" : "text-slate-400"}>
+                                    {rule.internationalUsage ? "Allowed" : "No"}
                                 </span>
                             </div>
-                        </div>
+                        </CardContent>
 
                         {rule.isActive && (
-                            <button 
-                                onClick={() => onDelete(rule.id)} 
-                                className="mt-6 w-full bg-red-600/10 text-red-400 border border-red-600/50 py-2 rounded hover:bg-red-600 hover:text-white transition"
-                            >
-                                Deactivate Rule
-                            </button>
+                            <CardFooter className="bg-emerald-50/50 dark:bg-emerald-950/30 p-3">
+                                <Button onClick={() => onDelete(rule.id)} variant="ghost" className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-8 text-xs">
+                                    Deactivate Rule
+                                </Button>
+                            </CardFooter>
                         )}
-                    </div>
+                    </Card>
                 ))}
-                
-                {rules.length === 0 && (
-                    <div className="col-span-full text-center py-10 text-gray-500">
-                        No Debit Card Rules found. Create one to get started.
-                    </div>
-                )}
             </div>
 
-            {/* CREATE RULE MODAL */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Define New Card Rule">
-                <form onSubmit={handleSubmit(onAdd)} className="space-y-4 text-gray-800">
+                <form onSubmit={handleSubmit(onAdd)} className="space-y-4">
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">Card Type Name</label>
-                        <input 
-                            {...register("cardType")} 
-                            placeholder="e.g. PLATINUM_PREMIUM" 
-                            className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white" 
-                            required 
-                        />
+                        <Label>Card Type Name</Label>
+                        <Input {...register("cardType")} placeholder="e.g. PLATINUM" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
                     </div>
-
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Annual Fee (₹)</label>
-                            <input 
-                                type="number" 
-                                {...register("annualFee")} 
-                                className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white" 
-                                required 
-                            />
+                            <Label>Annual Fee (₹)</Label>
+                            <Input type="number" {...register("annualFee")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Issuance Fee (₹)</label>
-                            <input 
-                                type="number" 
-                                {...register("issuanceFee")} 
-                                className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white" 
-                                required 
-                            />
+                            <Label>Issuance Fee (₹)</Label>
+                            <Input type="number" {...register("issuanceFee")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
                         </div>
                     </div>
-
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Daily Withdraw Limit</label>
-                            <input 
-                                type="number" 
-                                {...register("dailyWithdrawalLimit")} 
-                                className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white" 
-                                required 
-                            />
+                            <Label>Withdraw Limit</Label>
+                            <Input type="number" {...register("dailyWithdrawalLimit")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Daily Purchase Limit</label>
-                            <input 
-                                type="number" 
-                                {...register("dailyPurchaseLimit")} 
-                                className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white" 
-                                required 
-                            />
+                            <Label>Purchase Limit</Label>
+                            <Input type="number" {...register("dailyPurchaseLimit")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
                         </div>
                     </div>
-
-                    {/* Hardcoded Head Bank ID input (Ideally this comes from user context) */}
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">Head Bank ID</label>
-                        <input 
-                            type="number" 
-                            {...register("headBankId")} 
-                            placeholder="1" 
-                            className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white" 
-                            required 
-                        />
+                        <Label>Head Bank ID</Label>
+                        <Input type="number" {...register("headBankId")} className="bg-emerald-50 dark:bg-emerald-900 border-emerald-200 dark:border-emerald-700" required />
                     </div>
-
-                    <button 
-                        type="submit" 
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded mt-4"
-                    >
-                        Save Rule
-                    </button>
+                    <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Save Rule</Button>
                 </form>
             </Modal>
         </div>
