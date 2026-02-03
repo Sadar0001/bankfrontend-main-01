@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const base_url = "http://localhost:8080/api";
+const base_url = "https://final-bank-backend.onrender.com/api";
 
 // 1. Create and Export the Axios Instance
 export const api = axios.create({
