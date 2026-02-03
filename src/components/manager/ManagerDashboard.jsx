@@ -18,7 +18,7 @@ export default function ManagerDashboard() {
     const user = useAuthStore((state) => state.user);
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white pb-20">
+        <div className="min-h-screen bg-background text-foreground pb-20">
             <header className="px-8 py-10 bg-gradient-to-b from-purple-900/20 to-transparent border-b border-gray-800 mb-6">
                 <h1 className="text-3xl font-bold">Branch Manager Dashboard</h1>
                 <p className="text-gray-400 mt-1">ID: {user?.userId} | {user?.username}</p>

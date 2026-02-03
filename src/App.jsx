@@ -14,42 +14,39 @@ import HeadBankDashboard from "./components/headbank/HeadBankDashboard";
 function App() {
     return (
         <BrowserRouter>
-            <div className="min-h-screen bg-slate-300">
+            {/* LAYER 1: Main Page Background (Lightest Grey) - bg-slate-50 */}
+            <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans antialiased relative selection:bg-primary/20">
+
+                {/* Optional: Very faint texture */}
+                <div className="fixed inset-0 -z-10 h-full w-full bg-grid-pattern [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none opacity-40" />
+
                 <Navbar />
 
-                <div className="container mx-auto py-4">
+                {/* Main Content Container with padding */}
+                <div className="container mx-auto py-8 px-4 md:px-6">
                     <Routes>
-                        {/* Public Routes */}
                         <Route path="/" element={<UserSection/>}/>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/signup" element={<SignupPage/>}/>
 
-                        {/* PROTECTED ROUTES */}
-
-                        {/* 1. Customer Routes */}
                         <Route element={<RequireAuth allowedRoles={["CUSTOMER"]} />}>
                             <Route path="/customer/*" element={<CustomerDashboard />} />
                         </Route>
 
-                        {/* 2. Manager Routes */}
                         <Route element={<RequireAuth allowedRoles={["BRANCHMANAGER"]} />}>
                             <Route path="/manager/*" element={<ManagerDashboard />} />
                         </Route>
 
-                        {/* 3. Teller Routes */}
                         <Route element={<RequireAuth allowedRoles={["TELLER"]} />}>
                             <Route path="/teller/*" element={<TellerDashboard />} />
                         </Route>
 
-                        {/* 4. Head Bank Admin Routes */}
                         <Route element={<RequireAuth allowedRoles={["HEADMANAGER"]} />}>
                             <Route path="/headbank/*" element={<HeadBankDashboard />} />
                         </Route>
 
-                        {/* Errors */}
                         <Route path="/unauthorized" element={<h1>Access Denied</h1>}/>
                         <Route path="*" element={<h1>404 - Page Not Found</h1>}/>
-
                     </Routes>
                 </div>
             </div>

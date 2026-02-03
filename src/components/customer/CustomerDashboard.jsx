@@ -106,7 +106,7 @@ export default function CustomerDashboard() {
 // ==================== DASHBOARD HOME ====================
 function DashboardHome({ data, user, navigate, refresh }) {
     return (
-        <div className="min-h-screen bg-[#121212] text-white pb-20">
+        <div className="min-h-screen bg-background text-foreground pb-20">
             {/* HERO HEADER */}
             <header className="px-8 py-10 bg-gradient-to-b from-blue-900/20 to-transparent">
                 <h1 className="text-3xl font-bold">Hello, {user?.username} 👋</h1>
